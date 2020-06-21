@@ -29,9 +29,9 @@ Bind your actions:
 
 ```swift
 try machine.bindAction(.fetch, to: .idle)
-try machine.bindAction(.success, to: .fetching, .cycle)
+try machine.bindAction(.success, to: .fetching, .cycle) // Go back to beginning of cycle (first <> before current state)
 try machine.bindAction(.failure, to: .fetching)
-try machine.bindAction(.retry, to: .error, .cycle)
+try machine.bindAction(.retry, to: .error, .cycle)  // Go back to beginning of cycle (first <> before current state)
 try machine.bindAction(.reset, to: .error)
 ```
 
@@ -56,3 +56,25 @@ try machine.send(.fetch)
 ```
 
 And that's all it takes to get a working state machine 🎉
+
+This state machine is equivalent to:
+```
+┌────┐ ----fetch---> ┌────────┐ --failure-> ┌─────┐
+│idle│               │fetching│             │error│
+└────┘ <--success--- └────────┘ <--retry--- └─────┘
+  ⬑-------------------reset--------------------┘
+```
+
+## Operators
+* `|>`
+    One way state direction.
+    
+    Always goes to the next state
+* `<>`
+    Two way state direction.
+    
+    Can either go to the next state, or go back to the first link in cycle (`.first <> .second <> .third`, cycle from `.second` or `.third` would go to `.first`)
+* `<|>`
+    Loop state direction.
+    
+    Returns to the initial state
