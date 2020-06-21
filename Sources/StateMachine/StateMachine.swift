@@ -16,6 +16,9 @@ public struct StateMachine<T, A> where T: StateList, A: ActionList {
     var currentState: (T, Direction) {
         states[state]
     }
+    public var activeState: T {
+        currentState.0
+    }
     
     init(states: [(T, Direction)], events: [(T, () -> Void)] = []) {
         self.states = states
