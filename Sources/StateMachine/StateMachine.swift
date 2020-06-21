@@ -81,6 +81,7 @@ public struct StateMachine<T, A> where T: StateList, A: ActionList {
     public enum ActionModifier {
         case nextState
         case cycle
+        case jump(to: T)
     }
     var actions: [(A, T, ActionModifier)] = []
     public mutating func bindAction(_ action: A, to state: T, _ actionModifier: ActionModifier = .nextState) throws {
@@ -102,6 +103,8 @@ public struct StateMachine<T, A> where T: StateList, A: ActionList {
             try nextState()
         case .cycle:
             try cycle()
+        case .jump(to: let state):
+            try setState(to: state)
         }
         actionEvents.filter { $0.0 == action }
                     .forEach { $0.1() }
